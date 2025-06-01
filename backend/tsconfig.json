@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "es2016",                            
+
+    /* Modules */
+    "module": "commonjs",                           
+
+    /* Interop Constraints */
+    "esModuleInterop": true,                         
+    "forceConsistentCasingInFileNames": true,        
+    "strict": true,                                  
+    "skipLibCheck": true,                            
+
+    /* ✅ Soporte para tipos personalizados */
+    "typeRoots": ["./node_modules/@types", "./src/types"]
+  }
+}

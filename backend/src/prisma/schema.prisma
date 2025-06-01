@@ -1,0 +1,126 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id              Int       @id @default(autoincrement())
+  dni             String    @unique
+  nombre          String
+  email           String    @unique
+  password        String
+  fechaNacimiento DateTime
+  sexo            Sexo
+  telefono        String
+  direccion       String?
+  verificado      Boolean   @default(false)
+  rol             Rol       @default(PACIENTE)
+  citas           Cita[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Medico {
+  id             Int              @id @default(autoincrement())
+  nombre         String
+  dni            String           @unique
+  email          String           @unique
+  password       String
+  especialidadId Int
+  especialidad   Especialidad     @relation(fields: [especialidadId], references: [id])
+  citas          Cita[]
+  disponibilidad Disponibilidad[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model Especialidad {
+  id      Int      @id @default(autoincrement())
+  nombre  String   @unique
+  medicos Medico[]
+}
+
+model Cita {
+  id              Int        @id @default(autoincrement())
+  fecha           DateTime
+  creadoEn        DateTime   @default(now())
+  motivoConsulta  String?
+  observaciones   String?
+  estado          CitaEstado @default(PENDIENTE)
+  presencial      Boolean    @default(true)
+  ubicacion       String?
+  tipo            String?
+  usuario         Usuario    @relation(fields: [usuarioId], references: [id])
+  usuarioId       Int
+  medico          Medico     @relation(fields: [medicoId], references: [id])
+  medicoId        Int
+  documento       Documento?
+}
+
+model Documento {
+  id                   Int                  @id @default(autoincrement())
+  observaciones        String
+  fecha                DateTime             @default(now())
+  cita                 Cita                 @relation(fields: [citaId], references: [id])
+  citaId               Int                  @unique
+  medicamentosRecetados MedicamentoRecetado[]
+}
+
+model Medicamento {
+  id      Int                  @id @default(autoincrement())
+  nombre  String               @unique
+  recetas MedicamentoRecetado[]
+}
+
+model MedicamentoRecetado {
+  id            Int         @id @default(autoincrement())
+  dosis         String
+  frecuencia    String
+  duracion      String
+  documento     Documento   @relation(fields: [documentoId], references: [id])
+  documentoId   Int
+  medicamento   Medicamento @relation(fields: [medicamentoId], references: [id])
+  medicamentoId Int
+}
+
+model Disponibilidad {
+  id         Int        @id @default(autoincrement())
+  dia        DiaSemana
+  horaInicio String
+  horaFin    String
+  medico     Medico     @relation(fields: [medicoId], references: [id])
+  medicoId   Int
+}
+
+enum Rol {
+  PACIENTE
+  MEDICO
+  ADMIN
+}
+
+enum Sexo {
+  HOMBRE
+  MUJER
+  OTRO
+}
+
+enum DiaSemana {
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+  DOMINGO
+}
+
+enum CitaEstado {
+  PENDIENTE
+  ACEPTADA  
+  COMPLETADA
+  CANCELADA
+}
